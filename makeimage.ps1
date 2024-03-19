@@ -67,4 +67,6 @@ wsl.exe -d $distname chmod 755 /tmp/install.sh
 Write-Output $config | wsl.exe -d $distname 'cat' '>' '/etc/wsl.conf'
 wsl.exe -d $distname /tmp/install.sh
 
+wsl.exe -t $distname
+
 Pop-Location

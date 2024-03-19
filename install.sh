@@ -8,4 +8,5 @@ echo "deb [arch=amd64] https://packages.irods.org/apt/ $(lsb_release -sc) main" 
 
 apt-get update -y
 
-apt install -y irods-icommands dos2unix
+# Basic tools
+apt install -y irods-icommands irods-gridftp-client python3-irodsclient dos2unix ipython3 jupyter-core jupyterhub python-is-python3 python3-pip
