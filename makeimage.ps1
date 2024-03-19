@@ -1,7 +1,10 @@
 param ($distname, $storename)
 
+#$base = $env:Home
+$base = $env:UserProfile
+
 if ([System.String]::IsNullOrWhiteSpace($storename)) {
-    $storepath = Join-Path -Path $env:Home -ChildPath "wsl"
+    $storepath = Join-Path -Path $base -ChildPath "wsl"
 } else {
     if (-not [System.IO.Path]::IsPathRooted($storename)) {
         $storename = Join-Path -Path $env:Home -ChildPath $storename
@@ -14,6 +17,8 @@ if ([System.String]::IsNullOrWhiteSpace($storename)) {
 }
 $fullstorepath = Join-Path -Path $storepath -ChildPath $distname
 $cachepath = Join-Path -Path $storepath -ChildPath '.cache'
+
+New-Item -ItemType Directory -Path $cachepath -ErrorAction SilentlyContinue
 
 Write-Host "DIST", $distname
 Write-Host "HOME", $env:Home
