@@ -45,26 +45,12 @@ Write-Host "Image downloaded"
 
 wsl.exe --import $distname $fullstorepath $imagefile
 
-$config = @"
-[user]
-default=tud
-
-[network]
-hostname=tudelft
-"@
-
 $installscript = Get-Content .\install.sh -Raw
 
 Push-Location $env:Home
 
-wsl.exe -d $distname 'sed' '-i.bak' 's/^%sudo\s*ALL\=(ALL:ALL)\s*ALL/%sudo  ALL=(ALL)       NOPASSWD: ALL/' '/etc/sudoers'
-wsl.exe -d $distname useradd -m -G sudo tud -s /bin/bash
-
-#wsl.exe -d $distname apt install -y dos2unix
 Write-Output $installscript  | wsl.exe -d $distname 'cat' '|' 'sed' '$ s/.$//' '>' '/tmp/install.sh' # Bloody powershell...
 wsl.exe -d $distname chmod 755 /tmp/install.sh
-
-Write-Output $config | wsl.exe -d $distname 'cat' '>' '/etc/wsl.conf'
 wsl.exe -d $distname /tmp/install.sh
 
 wsl.exe -t $distname
