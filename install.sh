@@ -9,7 +9,9 @@ echo "deb [arch=amd64] https://packages.irods.org/apt/ $(lsb_release -sc) main" 
 apt-get update -y
 
 # Basic tools
-apt install -y irods-icommands irods-gridftp-client python3-irodsclient dos2unix ipython3 jupyter-core jupyterhub python-is-python3 python3-pip
+apt install -y irods-icommands irods-gridftp-client \
+    python3-irodsclient ipython3 jupyter-core jupyterhub python-is-python3 python3-pip \
+    socat
 
 sed -i.bak 's/^%sudo\s*ALL\=(ALL:ALL)\s*ALL/%sudo  ALL=(ALL)       NOPASSWD: ALL/' /etc/sudoers
 useradd -m -G sudo tud -s /bin/bash

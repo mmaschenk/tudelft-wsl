@@ -1,4 +1,8 @@
-param ($distname, $storename)
+param (
+    $distname, 
+    $storename,
+    $downloadurl = "https://cloud-images.ubuntu.com/wsl/jammy/current/ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz"
+)
 
 #$base = $env:Home
 $base = $env:UserProfile
@@ -17,6 +21,8 @@ if ([System.String]::IsNullOrWhiteSpace($storename)) {
 }
 $fullstorepath = Join-Path -Path $storepath -ChildPath $distname
 $cachepath = Join-Path -Path $storepath -ChildPath '.cache'
+$basename = $downloadurl.Substring($downloadurl.LastIndexOf("/") + 1)
+$imagefile = Join-Path -Path $cachepath -ChildPath $basename
 
 New-Item -ItemType Directory -Path $cachepath -ErrorAction SilentlyContinue
 
@@ -30,18 +36,15 @@ if (Test-Path $fullstorepath) {
     throw "Directory {0} already exists. Will not continue" -f $fullstorepath
 }
 
-
-$imagefile = Join-Path -Path $cachepath -ChildPath "ubuntu.tar.gz"
-
 Write-Host "IMAGE", $imagefile
-
-#Invoke-WebRequest -Uri https://cloud-images.ubuntu.com/wsl/jammy/current/ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz | wsl.exe --import $distname $fullstorepath -
-
 New-Item -Path $fullstorepath -ItemType Directory > $null
-$webclient = New-Object System.Net.WebClient
-Write-Host "Downloading image"
-#$webclient.DownloadFile("https://cloud-images.ubuntu.com/wsl/jammy/current/ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz", $imagefile.ToString())
-Write-Host "Image downloaded"
+
+if (-not (Test-Path $imagefile)) {
+    $webclient = New-Object System.Net.WebClient
+    Write-Host "Downloading image"
+    $webclient.DownloadFile($downloadurl, $imagefile.ToString())
+    Write-Host "Image downloaded"
+}
 
 wsl.exe --import $distname $fullstorepath $imagefile
 
