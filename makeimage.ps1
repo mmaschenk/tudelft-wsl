@@ -52,10 +52,21 @@ $installscript = Get-Content .\install.sh -Raw
 
 Push-Location $env:Home
 
-Write-Output $installscript  | wsl.exe -d $distname 'cat' '|' 'sed' '$ s/.$//' '>' '/tmp/install.sh' # Bloody powershell...
+Write-Output $installscript  | wsl.exe -d $distname 'cat' '|' 'sed' '$ s/\\r//' '>' '/tmp/install.sh' # Bloody git on windows...
 wsl.exe -d $distname chmod 755 /tmp/install.sh
-wsl.exe -d $distname /tmp/install.sh
+#wsl.exe -d $distname /tmp/install.sh
 
 wsl.exe -t $distname
+
+Write-Host "Exporting"
+wsl.exe --export $distname "$distname.tar"
+
+Write-Host "Compressing"
+7z.exe a "$distname.tgz" "$distname.tar"
+
+Write-Host "Checksumming"
+$filehash = Get-FileHash "$distname.tgz"
+
+$filehash.Hash | Out-File -FilePath "$distname.tgz.hash"
 
 Pop-Location
