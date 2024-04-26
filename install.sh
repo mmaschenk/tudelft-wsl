@@ -37,6 +37,8 @@ cat <<EOD >> ~tud/.irods/irods_environment.json
 }
 EOD
 
+chown -R tud ~tud/.irods
+
 cat << EOD >> /etc/wsl.conf
 [user]
 default=tud
