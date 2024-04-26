@@ -46,15 +46,19 @@ if (-not (Test-Path $imagefile)) {
     Write-Host "Image downloaded"
 }
 
+Write-Host "Importing"
 wsl.exe --import $distname $fullstorepath $imagefile
+Write-Host "Imported"
 
+Write-Host "Installing"
 $installscript = Get-Content .\install.sh -Raw
 
 Push-Location $env:Home
 
-Write-Output $installscript  | wsl.exe -d $distname 'cat' '|' 'sed' '$ s/\\r//' '>' '/tmp/install.sh' # Bloody git on windows...
+Write-Output $installscript  | wsl.exe -d $distname 'cat' '|' 'sed' 's/.$//' '>' '/tmp/install.sh' # Bloody powershell...
 wsl.exe -d $distname chmod 755 /tmp/install.sh
-#wsl.exe -d $distname /tmp/install.sh
+wsl.exe -d $distname /tmp/install.sh
+Write-Host "Installed"
 
 wsl.exe -t $distname
 
@@ -70,3 +74,4 @@ $filehash = Get-FileHash "$distname.tgz"
 $filehash.Hash | Out-File -FilePath "$distname.tgz.hash"
 
 Pop-Location
+
