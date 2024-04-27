@@ -22,6 +22,7 @@ jobs:
           }
           $Env:baseurl = "https://github.com/$Env:GITHUB_REPOSITORY/releases/download/$Env:GITHUB_REF_NAME/"
           Get-Content README.md | foreach { [Environment]::ExpandEnvironmentVariables($_) } | Set-Content README.rendered.md
+          (Get-Content -Raw tudinstaller.ps1 ) -replace '%baseurl%', $Env:baseurl  | Set-Content tudinstaller.ps1
           Get-ChildItem
         if: startsWith(github.ref, 'refs/tags/')
       - name: Release
@@ -33,4 +34,4 @@ jobs:
             tudelft.tgz.hash
             tudinstaller.ps1
           body_path: README.rendered.md
-          draft: ${{steps.build.outputs.draft}}
+          prerelease: ${{steps.build.outputs.draft}}

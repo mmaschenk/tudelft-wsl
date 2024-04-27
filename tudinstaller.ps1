@@ -1,5 +1,5 @@
 param (
-    $downloadurl = "https://github.com/mmaschenk/tudelft-wsl/releases/latest/download/tudelft.tgz"
+    $downloadurl = "%baseurl%/tudelft.tgz"
 )
 
 function Update-ImageCacheFile {
