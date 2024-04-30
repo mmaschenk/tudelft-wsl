@@ -1,5 +1,6 @@
 param (
-    $downloadurl = "%baseurl%/tudelft.tgz"
+    $downloadurl = "%baseurl%/tudelft.tgz",
+    $RegistrationName = "tudelft"
 )
 
 function Update-ImageCacheFile {
@@ -20,12 +21,12 @@ function Update-ImageCacheFile {
     $imagefile = Join-Path -Path $cachepath -ChildPath $basename
     $hashurl = "${downloadurl}.hash"
 
-    Write-Host "Downloadurl:   ", $downloadurl
-    Write-Host "Base is:       ", $base
-    Write-Host "Storename:     ", $storename
-    Write-Host "Cache path:    ", $cachepath
-    Write-Host "Imagefile:     ", $imagefile
-    Write-Host "Hashurl:       ", $hashurl
+    Write-Host("Downloadurl:           {0}" -f $downloadurl)
+    Write-Host("Base is:               {0}" -f $base)
+    Write-Host("Storename:             {0}" -f $storename)
+    Write-Host("Cache path:            {0}" -f $cachepath)
+    Write-Host("Imagefile:             {0}" -f $imagefile)
+    Write-Host("Hashurl:               {0}" -f $hashurl)
 
     $ni = New-Item -ItemType Directory -Path $cachepath -ErrorAction SilentlyContinue
 
@@ -36,12 +37,10 @@ function Update-ImageCacheFile {
         Write-Host "* Image file not yet present"
         $localhashvalue = "NOTPRESENT"
     }
-
     $remotehash = Invoke-WebRequest -URI $hashurl
-
     $remotehashvalue = [System.Text.Encoding]::ASCII.GetString($remotehash.Content).Trim()
-    Write-Host("Local hash value:  [{0}]" -f $localhashvalue)
-    Write-Host("Remote hash value: [{0}]" -f $remotehashvalue)
+    Write-Host("Local hash:            {0}" -f $localhashvalue)
+    Write-Host("Remote hash:           {0}" -f $remotehashvalue)
 
     if ($remotehashvalue -ne $localhashvalue) {
         Write-Host "* Need to download image file"
@@ -67,11 +66,15 @@ function Initialize-WSLStoreLocation {
     $fullstorepath = Join-Path -Path $storename -ChildPath $distribution
 
     if (Test-Path $fullstorepath) {
-        throw ("Directory {0} already exists." -f $fullstorepath)
-    }
-    $ni = New-Item -Path $fullstorepath -ItemType Directory 
-    Write-Host("Created fullstorepath: {0} [{1}]" -f $fullstorepath, $fullstorepath.getType())
+        $dirinfo = Get-ChildItem $fullstorepath
 
+        if ($dirinfo.count -ne 0) {
+            throw ("Directory {0} already exists and is not empty." -f $fullstorepath)
+        } else {
+            $ni = New-Item -Path $fullstorepath -ItemType Directory 
+            Write-Host("Created fullstorepath: {0}" -f $fullstorepath)
+        }
+    }
     return $fullstorepath.ToString()
 }
 
@@ -84,14 +87,13 @@ function  Register-ImageFile {
     $cachefile = Update-ImageCacheFile($downloadurl)
     $fullstorepath = Initialize-WSLStoreLocation($registrationname)
 
-    Write-Host("cachefile:       : {0} [{1}]" -f $cachefile, $cachefile.getType())
-    Write-Host("registration name: {0} [{1}]" -f $registrationname, $registrationname.getType())
-    Write-Host("storepath:         {0} [{1}]" -f $fullstorepath, $fullstorepath.getType())
-
+    Write-Host("cachefile:             {0}" -f $cachefile)
+    Write-Host("registration:          {0}" -f $registrationname)
+    Write-Host("storepath:             {0}" -f $fullstorepath)
+    
     Write-Host("going to run: wsl.exe --import {0} {1} {2}" -f $registrationname,"$fullstorepath","$cachefile")
     wsl.exe --import $registrationname "$fullstorepath" "$cachefile"
 }
 
-
-Write-Host("Installing:  {0}" -f $downloadurl)
-Register-ImageFile -downloadurl $downloadurl
+Write-Host("Installing:            {0}" -f $downloadurl)
+Register-ImageFile -downloadurl $downloadurl -registrationname $RegistrationName

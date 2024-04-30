@@ -20,24 +20,21 @@ mkdir ~tud/.irods
 
 cat <<EOD >> ~tud/.irods/irods_environment.json
 {
+    "irods_authentication_scheme": "pam",
     "irods_client_server_negotiation": "request_server_negotiation",
     "irods_client_server_policy": "CS_NEG_REQUIRE",
     "irods_encryption_algorithm": "AES-256-CBC",
     "irods_encryption_key_size": 32,
     "irods_encryption_num_hash_rounds": 16,
     "irods_encryption_salt_size": 8,
-    "irods_host": "irods.cloud.tudelft.ninja",
+    "irods_host": "irods.tudelft.nl",
     "irods_port": 1247,
-    "irods_ssl_ca_certificate_file": "",
-    "irods_ssl_certificate_chain_file": "",
-    "irods_ssl_certificate_key_file": "",
-    "irods_ssl_dh_params_file": "",
     "irods_ssl_verify_server": "hostname",
-    "irods_zone_name": "tudcloud"
+    "irods_zone_name": "tud"
 }
 EOD
 
-chown -R tud ~tud/.irods
+chown -R tud.tud ~tud/.irods
 
 cat << EOD >> /etc/wsl.conf
 [user]
