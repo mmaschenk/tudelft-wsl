@@ -34,4 +34,4 @@ jobs:
             tudelft.tgz.hash
             tudinstaller.ps1
           body_path: README.rendered.md
-          prerelease: ${{steps.build.outputs.draft}}
+          prerelease: ${{steps.build.outputs.draft == 1}}
