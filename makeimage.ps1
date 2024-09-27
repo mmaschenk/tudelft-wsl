@@ -51,11 +51,12 @@ wsl.exe --import $distname $fullstorepath $imagefile
 Write-Host "Imported"
 
 Write-Host "Installing"
-$installscript = Get-Content .\install.sh -Raw
+Copy-Item .\install.sh "\\wsl$\$distname\tmp\install.sh"
 
 Push-Location $env:Home
 
-Write-Output $installscript  | wsl.exe -d $distname 'cat' '|' 'sed' 's/.$//' '>' '/tmp/install.sh' # Bloody powershell...
+# Write-Output $installscript  | wsl.exe -d $distname 'cat' '|' 'sed' 's/.$//' '>' '/tmp/install.sh' # Bloody powershell...
+# wsl.exe -d $distname cp $wslpath /tmp/install.sh
 wsl.exe -d $distname chmod 755 /tmp/install.sh
 wsl.exe -d $distname /tmp/install.sh
 Write-Host "Installed"

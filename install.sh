@@ -2,39 +2,11 @@
 
 echo "Doing installation"
 
-wget -qO - https://packages.irods.org/irods-signing-key.asc > /etc/apt/trusted.gpg.d/irods-signing-key.asc
-
-echo "deb [arch=amd64] https://packages.irods.org/apt/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/renci-irods.list
+ANSIBLE_REPO="https://github.com/mmaschenk/tudelft-wsl-ansible.git"
 
 apt-get update -y
 
-# Basic tools
-apt install -y irods-icommands irods-gridftp-client \
-    python3-irodsclient ipython3 jupyter-core jupyterhub python-is-python3 python3-pip \
-    socat
-
-sed -i.bak 's/^%sudo\s*ALL\=(ALL:ALL)\s*ALL/%sudo  ALL=(ALL)       NOPASSWD: ALL/' /etc/sudoers
-useradd -m -G sudo tud -s /bin/bash
-
-mkdir ~tud/.irods
-
-cat <<EOD >> ~tud/.irods/irods_environment.json
-{
-    "irods_authentication_scheme": "pam",
-    "irods_client_server_negotiation": "request_server_negotiation",
-    "irods_client_server_policy": "CS_NEG_REQUIRE",
-    "irods_encryption_algorithm": "AES-256-CBC",
-    "irods_encryption_key_size": 32,
-    "irods_encryption_num_hash_rounds": 16,
-    "irods_encryption_salt_size": 8,
-    "irods_host": "irods.tudelft.nl",
-    "irods_port": 1247,
-    "irods_ssl_verify_server": "hostname",
-    "irods_zone_name": "tud"
-}
-EOD
-
-chown -R tud.tud ~tud/.irods
+apt install -y ansible
 
 cat << EOD >> /etc/wsl.conf
 [user]
@@ -44,3 +16,39 @@ default=tud
 hostname=tudelft
 EOD
 
+CLONE_DIR="/tmp/repo"
+ANSIBLE_BOOTSTRAP_PLAYBOOK="/tmp/ansible_bootstrap.yml"
+ANSIBLE_TEMP_PLAYBOOK="/tmp/combined_ansible.yml"
+ANSIBLE_MAIN_PLAYBOOK="${CLONE_DIR}/wsl.yml"
+
+cat <<EOD > "$ANSIBLE_BOOTSTRAP_PLAYBOOK"
+---
+- name: Clone and run Ansible playbook from GitHub
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Ensure Git is installed
+      package:
+        name: git
+        state: present
+
+    - name: Clone the GitHub repository
+      shell: |
+        if [ ! -d "${CLONE_DIR}/.git" ]; then
+          git clone ${ANSIBLE_REPO} ${CLONE_DIR}
+        else
+          cd ${CLONE_DIR} && git pull
+        fi
+
+    - name: Find the main playbook file
+      find:
+        paths: "${CLONE_DIR}"
+        patterns: "*.yml"
+        recurse: yes
+      register: found_playbooks
+
+EOD
+
+ansible-playbook -i localhost, -c local "$ANSIBLE_BOOTSTRAP_PLAYBOOK"
+
+ansible-playbook -i localhost, -c local "$ANSIBLE_MAIN_PLAYBOOK"
