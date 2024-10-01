@@ -1,7 +1,9 @@
 # tudelft-wsl
 
-This repository helps you install a TU Delft specific ubuntu image for wsl. It downloads and registers the image, allowing you to run wsl with a number of pre-installed tools available. Among these tools are:
+This repository helps you install a TU Delft specific ubuntu image for wsl. It downloads and registers the image, allowing you to run wsl with a number of pre-installed tools available. The tools that are installed are retrieved as an ansbile-playbook from repository https://github.com/mmaschenk/tudelft-wsl-ansible.git. Currently they include
+
 - irods command line clients
+- ssh-agent forwarding setup
 
 ## quick install
 

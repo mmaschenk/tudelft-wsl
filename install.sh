@@ -23,7 +23,7 @@ ANSIBLE_MAIN_PLAYBOOK="${CLONE_DIR}/wsl.yml"
 
 cat <<EOD > "$ANSIBLE_BOOTSTRAP_PLAYBOOK"
 ---
-- name: Clone and run Ansible playbook from GitHub
+- name: Clone Ansible playbook from GitHub
   hosts: localhost
   gather_facts: no
   tasks:

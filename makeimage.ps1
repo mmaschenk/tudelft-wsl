@@ -52,15 +52,9 @@ Write-Host "Imported"
 
 Write-Host "Installing"
 Copy-Item .\install.sh "\\wsl$\$distname\tmp\install.sh"
-Copy-Item .\install.sh "\\wsl$\$distname\root\install.sh"
 
 Push-Location $env:Home
 
-# Write-Output $installscript  | wsl.exe -d $distname 'cat' '|' 'sed' 's/.$//' '>' '/tmp/install.sh' # Bloody powershell...
-# wsl.exe -d $distname cp $wslpath /tmp/install.sh
-wsl.exe -d $distname cat /tmp/install.sh
-wsl.exe -d $distname ls -l /tmp
-wsl.exe -d $distname df
 wsl.exe -d $distname chmod 755 /tmp/install.sh
 wsl.exe -d $distname /tmp/install.sh
 Write-Host "Installed"
